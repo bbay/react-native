@@ -18,6 +18,7 @@ import java.util.Map;
 import android.graphics.Bitmap;
 import android.os.Build;
 import android.text.TextUtils;
+import android.webkit.GeolocationPermissions;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.webkit.WebChromeClient;
@@ -245,11 +246,14 @@ public class ReactWebViewManager extends SimpleViewManager<WebView> {
   @Override
   protected WebView createViewInstance(ThemedReactContext reactContext) {
     ReactWebView webView = new ReactWebView(reactContext);
-    webView.setWebChromeClient(new WebChromeClient());
+    webView.setWebChromeClient(new WebChromeClient() {
+      @Override
+      public void onGeolocationPermissionsShowPrompt(String origin, GeolocationPermissions.Callback callback) {
+        callback.invoke(origin, true, false);
+      }
+    });
     reactContext.addLifecycleEventListener(webView);
     mWebViewConfig.configWebView(webView);
-    webView.getSettings().setBuiltInZoomControls(true);
-    webView.getSettings().setDisplayZoomControls(false);
 
     if (ReactBuildConfig.DEBUG && Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
       WebView.setWebContentsDebuggingEnabled(true);
